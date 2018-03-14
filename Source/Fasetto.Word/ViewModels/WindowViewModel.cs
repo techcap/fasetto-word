@@ -9,12 +9,7 @@ namespace Fasetto.Word
     /// </summary>
     public class WindowViewModel : BaseViewModel
     {
-        #region Private Member
-
-        /// <summary>
-        /// The window this view model controls
-        /// </summary>
-        private Window mWindow;
+        private Window Window;
 
         /// <summary>
         /// The window resizer helper that keeps the window size correct in various states
@@ -27,18 +22,9 @@ namespace Fasetto.Word
         private Thickness mOuterMarginSize = new Thickness(5);
 
         /// <summary>
-        /// The radius of the edges of the window
-        /// </summary>
-        private int mWindowRadius = 10;
-
-        /// <summary>
         /// The last known dock position
         /// </summary>
         private WindowDockPosition mDockPosition = WindowDockPosition.Undocked;
-
-        #endregion
-
-        #region Public Properties
 
         /// <summary>
         /// The smallest width the window can go to
@@ -59,12 +45,12 @@ namespace Fasetto.Word
         /// <summary>
         /// True if the window should be borderless because it is docked or maximized
         /// </summary>
-        public bool Borderless => (mWindow.WindowState == WindowState.Maximized || mDockPosition != WindowDockPosition.Undocked);
+        public bool Borderless => (Window.WindowState == WindowState.Maximized || mDockPosition != WindowDockPosition.Undocked);
 
         /// <summary>
         /// The size of the resize border around the window
         /// </summary>
-        public int ResizeBorder => mWindow.WindowState == WindowState.Maximized ? 0 : 4;
+        public int ResizeBorder => Window.WindowState == WindowState.Maximized ? 0 : 4;
 
         /// <summary>
         /// The size of the resize border around the window, taking into account the outer margin
@@ -85,10 +71,11 @@ namespace Fasetto.Word
         public Thickness OuterMarginSize
         {
             // If it is maximized or docked, no border
-            get => mWindow.WindowState == WindowState.Maximized ? mWindowResizer.CurrentMonitorMargin : (Borderless ? new Thickness(0) : mOuterMarginSize);
+            get => Window.WindowState == WindowState.Maximized ? mWindowResizer.CurrentMonitorMargin : (Borderless ? new Thickness(0) : mOuterMarginSize);
             set => mOuterMarginSize = value;
         }
 
+        private int mWindowRadius = 10;
         /// <summary>
         /// The radius of the edges of the window
         /// </summary>
@@ -102,7 +89,7 @@ namespace Fasetto.Word
         /// <summary>
         /// The rectangle border around the window when docked
         /// </summary>
-        public int FlatBorderThickness => Borderless && mWindow.WindowState != WindowState.Maximized ? 1 : 0;
+        public int FlatBorderThickness => Borderless && Window.WindowState != WindowState.Maximized ? 1 : 0;
 
         /// <summary>
         /// The radius of the edges of the window
@@ -124,56 +111,33 @@ namespace Fasetto.Word
         /// </summary>
         public bool DimmableOverlayVisible { get; set; }
         
-        #endregion
-
-        #region Commands
-
-        /// <summary>
-        /// The command to minimize the window
-        /// </summary>
         public ICommand MinimizeCommand { get; set; }
 
-        /// <summary>
-        /// The command to maximize the window
-        /// </summary>
         public ICommand MaximizeCommand { get; set; }
 
-        /// <summary>
-        /// The command to close the window
-        /// </summary>
         public ICommand CloseCommand { get; set; }
 
-        /// <summary>
-        /// The command to show the system menu of the window
-        /// </summary>
         public ICommand MenuCommand { get; set; }
 
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
         public WindowViewModel(Window window)
         {
-            mWindow = window;
+            Window = window;
 
             // Listen out for the window resizing
-            mWindow.StateChanged += (sender, e) =>
+            Window.StateChanged += (sender, e) =>
             {
                 // Fire off events for all properties that are affected by a resize
                 WindowResized();
             };
 
             // Create commands
-            MinimizeCommand = new RelayCommand(() => mWindow.WindowState = WindowState.Minimized);
-            MaximizeCommand = new RelayCommand(() => mWindow.WindowState ^= WindowState.Maximized);
-            CloseCommand = new RelayCommand(() => mWindow.Close());
-            MenuCommand = new RelayCommand(() => SystemCommands.ShowSystemMenu(mWindow, GetMousePosition()));
+            MinimizeCommand = new RelayCommand(() => Window.WindowState = WindowState.Minimized);
+            MaximizeCommand = new RelayCommand(() => Window.WindowState ^= WindowState.Maximized);
+            CloseCommand = new RelayCommand(() => Window.Close());
+            MenuCommand = new RelayCommand(() => SystemCommands.ShowSystemMenu(Window, GetMousePosition()));
 
             // Fix window resize issue
-            mWindowResizer = new WindowResizer(mWindow);
+            mWindowResizer = new WindowResizer(Window);
 
             // Listen out for dock changes
             mWindowResizer.WindowDockChanged += (dock) =>
@@ -200,20 +164,12 @@ namespace Fasetto.Word
                 BeingMoved = false;
 
                 // Check for moved to top of window and not at an edge
-                if (mDockPosition == WindowDockPosition.Undocked && mWindow.Top == mWindowResizer.CurrentScreenSize.Top)
+                if (mDockPosition == WindowDockPosition.Undocked && Window.Top == mWindowResizer.CurrentScreenSize.Top)
                     // If so, move it to the true top (the border size)
-                    mWindow.Top = -OuterMarginSize.Top;
+                    Window.Top = -OuterMarginSize.Top;
             };
         }
 
-        #endregion
-
-        #region Private Helpers
-
-        /// <summary>
-        /// Gets the current mouse position on the screen
-        /// </summary>
-        /// <returns></returns>
         private Point GetMousePosition()
         {
             return mWindowResizer.GetCursorPosition();
@@ -233,8 +189,5 @@ namespace Fasetto.Word
             OnPropertyChanged(nameof(WindowRadius));
             OnPropertyChanged(nameof(WindowCornerRadius));
         }
-
-
-        #endregion
     }
 }
