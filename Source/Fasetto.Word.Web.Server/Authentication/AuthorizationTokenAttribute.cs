@@ -8,17 +8,10 @@ namespace Fasetto.Word.Web.Server
     /// </summary>
     public class AuthorizeTokenAttribute : AuthorizeAttribute
     {
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
         public AuthorizeTokenAttribute()
         {
             // Add the JWT bearer authentication scheme
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme;
         }
-
-        #endregion
     }
 }

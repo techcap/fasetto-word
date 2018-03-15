@@ -12,9 +12,6 @@ namespace Fasetto.Word.Core
     /// </summary>
     public interface IHavePassword
     {
-        /// <summary>
-        /// The secure password
-        /// </summary>
         SecureString SecurePassword { get; }
     }
 }

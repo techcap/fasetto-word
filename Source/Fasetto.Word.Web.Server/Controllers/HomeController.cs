@@ -13,8 +13,6 @@ namespace Fasetto.Word.Web.Server
     /// </summary>
     public class HomeController : Controller
     {
-        #region Protected Members
-
         /// <summary>
         /// The scoped Application context
         /// </summary>
@@ -30,16 +28,6 @@ namespace Fasetto.Word.Web.Server
         /// </summary>
         protected SignInManager<ApplicationUser> mSignInManager;
 
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="context">The injected context</param>
-        /// <param name="signInManager">The Identity sign in manager</param>
-        /// <param name="userManager">The Identity user manager</param>
         public HomeController(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
@@ -49,8 +37,6 @@ namespace Fasetto.Word.Web.Server
             mUserManager = userManager;
             mSignInManager = signInManager;
         }
-
-        #endregion
 
         /// <summary>
         /// Basic welcome page
